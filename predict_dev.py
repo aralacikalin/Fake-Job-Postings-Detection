@@ -9,17 +9,17 @@ from model import FakeNewsClassifierModel, FakeNewsClassifierConfig
 from data_prep import prepare_dataset, tokenizer, addTokenLength
 
 
-tokenizedDatasetTest = prepare_dataset("data/test_handout.csv", tokenizer = tokenizer, test_set=True)
-tokenizedDatasetTest = tokenizedDatasetTest.map(addTokenLength)
+eval_dataset = prepare_dataset("data/dev.csv", tokenizer = tokenizer, test_set=True)
+eval_dataset = eval_dataset.map(addTokenLength)
 
 AutoConfig.register("fakenews", FakeNewsClassifierConfig)
 AutoModelForSequenceClassification.register(FakeNewsClassifierConfig, FakeNewsClassifierModel)
 
-model = AutoModelForSequenceClassification.from_pretrained('results/checkpoint-2000')
-tokenizer = AutoTokenizer.from_pretrained('results/checkpoint-2000')
+model = AutoModelForSequenceClassification.from_pretrained('results/dbu-0.25drop/checkpoint-44500')
+tokenizer = AutoTokenizer.from_pretrained('results/dbu-0.25drop/checkpoint-44500')
 
 training_args = TrainingArguments(
-	output_dir='/results/4-res',
+	output_dir='results/4-res',
 	learning_rate=1e-5,
 	per_device_train_batch_size=16,
 	per_device_eval_batch_size=16,
@@ -49,17 +49,17 @@ trainer = Trainer(
 )
 
 # results=trainer.evaluate()
-results=trainer.predict(tokenizedDatasetTest)[0]
-data = pd.read_csv("data/test_handout.csv")
+results=trainer.predict(eval_dataset)[0]
+data = pd.read_csv("data/dev.csv")
 data=data.drop(columns=['title', 'location', "company_profile","telecommuting","has_company_logo","has_questions","description","requirements","benefits","employment_type","required_experience","industry","function","salary_range","department","required_education"])
 data=data.drop(data.columns[0], axis=1)
 
 resultLabels=[]
 for res in results:
-  resultLabels.append(np.argmax(res))
+	resultLabels.append(np.argmax(res))
 
 data["fraudulent"]=resultLabels
-data.to_csv("data/test_predicted.csv")
+data.to_csv("data/dev_predicted.csv")
 
 
 # print(results)
