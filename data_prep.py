@@ -61,7 +61,7 @@ def charCleaning(example):
 	example['text']=newFullText
 	return example
 
-def prepare_dataset(csv_path="/content/train.csv", tokenizer = tokenizer, max_size_des = 200, max_size_other = 30):
+def prepare_dataset(csv_path = "/content/train.csv", tokenizer = tokenizer, test_set = False, max_size_des = 200, max_size_other = 30):
 	# Reading csv file, and dropping irrelevant columns
 	data = pd.read_csv(csv_path)
 	data = data.drop(columns = ["job_id","salary_range","department","required_education"])
@@ -75,9 +75,11 @@ def prepare_dataset(csv_path="/content/train.csv", tokenizer = tokenizer, max_si
 
 	# Merging Input columns into `text` and creating output column as `label`
 	data['text'] = data[['title', 'location', "company_profile","description","requirements","employment_type","industry","function"]].astype(str).agg(' [SEP] '.join, axis=1)
-	data["label"] = data["fraudulent"]
+	if not test_set:
+		data["label"] = data["fraudulent"]
+		data = data.drop(columns=["fraudulent"])
 	# Removing all columns except 'text' and 'label'
-	data = data.drop(columns=['title', 'location', "company_profile","description","requirements","benefits","employment_type","required_experience","industry","function","fraudulent"])
+	data = data.drop(columns=['title', 'location', "company_profile","description","requirements","benefits","employment_type","required_experience","industry","function"])
 
 	# Building dataset from pandas frame
 	dataset = Dataset.from_pandas(data)
@@ -88,3 +90,4 @@ def prepare_dataset(csv_path="/content/train.csv", tokenizer = tokenizer, max_si
 
 tokenizedDataset = prepare_dataset("data/train.csv", tokenizer = tokenizer)
 fullDataset = tokenizedDataset.map(addTokenLength)
+

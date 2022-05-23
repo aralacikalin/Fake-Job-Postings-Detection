@@ -9,7 +9,7 @@ from transformers import Trainer, TrainingArguments
 tokenizedDataset = prepare_dataset("data/train.csv", tokenizer = tokenizer)
 fullDataset = tokenizedDataset.map(addTokenLength)
 
-tokenizedDevDataset = prepare_dataset("data/train.csv", tokenizer = tokenizer)
+tokenizedDevDataset = prepare_dataset("data/dev.csv", tokenizer = tokenizer)
 fullDatasetDev = tokenizedDevDataset.map(addTokenLength)
 
 hyperparams = {
@@ -17,6 +17,7 @@ hyperparams = {
     'dropout_rate': 0.5,
     'num_classes': 2
 }
+
 config = FakeNewsClassifierConfig(**hyperparams)
 model = FakeNewsClassifierModel(config)
 
