@@ -11,7 +11,7 @@ import torch.nn as nn
 from transformers import BertTokenizer, BertTokenizerFast
 from datasets import Dataset, load_metric, load_dataset
 
-tokenizer = BertTokenizerFast.from_pretrained('bert-base-cased')
+tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
 
 def cleaner(x, maxLength):
 	if(type(x)!=str):
